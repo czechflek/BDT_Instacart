@@ -37,7 +37,8 @@ We use the following command to connect to Hive:
  ```
 
 Now we can create a new database called `instacart`
-```sql
+
+```hql
 CREATE DATABASE IF NOT EXISTS instacart;
 USE instacart;
 ```
@@ -55,7 +56,7 @@ USE instacart;
 
 HQL script which creates an external table `aisles`:
 
-```sql
+```hql
 CREATE EXTERNAL TABLE IF NOT EXISTS aisles (
     aisle_id INT,
     aisle STRING)
@@ -76,7 +77,7 @@ tblproperties("skip.header.line.count"="1");
 
 HQL script which creates an external table `departments`:
 
-```sql
+```hql
 CREATE EXTERNAL TABLE IF NOT EXISTS departments (
     department_id INT,
     department STRING)
@@ -99,7 +100,7 @@ tblproperties("skip.header.line.count"="1");
 
 HQL script which creates an external table `products`:
 
-```sql
+```hql
 CREATE EXTERNAL TABLE IF NOT EXISTS products (
     product_id INT,
     product_name STRING,
@@ -127,7 +128,7 @@ tblproperties("skip.header.line.count"="1");
 
 HQL script which creates an external table `orders`:
 
-```sql
+```hql
 CREATE EXTERNAL TABLE IF NOT EXISTS orders (
     order_id INT,
     user_id INT,
