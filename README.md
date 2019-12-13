@@ -1,4 +1,4 @@
-# Big Data Analysis - Instacart
+# BigData Analysis - Instacart
 
 ## Dataset
 
@@ -83,7 +83,7 @@ STORED AS PARQUET
 tblproperties("parquet.compression"="SNAPPY");
 ```
 
-Now we can load the the data into the new table and drop the external one:
+Now we can load the data into the new table and drop the external one:
 
 ```hql
 INSERT OVERWRITE TABLE aisles
@@ -126,7 +126,7 @@ STORED AS PARQUET
 tblproperties("parquet.compression"="SNAPPY");
 ```
 
-Now we can load the the data into the new table and drop the external one:
+Now we can load the data into the new table and drop the external one:
 
 ```hql
 INSERT OVERWRITE TABLE departments
@@ -175,7 +175,7 @@ STORED AS PARQUET
 tblproperties("parquet.compression"="SNAPPY");
 ```
 
-Now we can load the the data into the new table and drop the external one:
+Now we can load the data into the new table and drop the external one:
 
 ```hql
 INSERT OVERWRITE TABLE products
@@ -235,7 +235,7 @@ STORED AS PARQUET
 tblproperties("parquet.compression"="SNAPPY");
 ```
 
-Now we can load the the data into the new table and drop the external one:
+Now we can load the data into the new table and drop the external one:
 
 ```hql
 INSERT OVERWRITE TABLE orders
@@ -289,7 +289,7 @@ STORED AS PARQUET
 tblproperties("parquet.compression"="SNAPPY");
 ```
 
-Now we can load the the data into the new table and drop the external one:
+Now we can load the data into the new table and drop the external one:
 
 ```hql
 INSERT OVERWRITE TABLE order_products
@@ -308,7 +308,7 @@ DROP TABLE order_products__ext;
 ### Top 5 Categories
 
 Since there is no category field, we are going to use `aisles` as our categories.
-To determine the most popular ones, we need to join `order_products` with `products` and then again with `aisles`. After that, we group the new joined table by aisles and extract the top 5.
+To determine the most popular ones, we need to join `order_products` with `products` and then again with `aisles`. After that, we group the newly joined table by aisles and extract the top 5.
 
 ```hql
 SELECT COUNT(*) as Number_of_Products, A.aisle as Category
@@ -334,4 +334,37 @@ The query above results in the following output:
 | 1449684             | yogurt                      |
 | 1005632             | packaged cheese             |
 +---------------------+-----------------------------+--+
+```
+
+### Top 10 Products
+
+To determine the most popular products, we need to join `order_products` with `products`. Then that, we simply group the newly joined table by profucts and extract the top 5.
+
+```hql
+SELECT COUNT(*) as Number_of_Orders, P.product_name as Product
+FROM order_products
+    LEFT JOIN products as P
+        ON order_products.product_id = P.product_id
+GROUP BY P.product_name
+ORDER BY Number_of_Orders DESC
+LIMIT 10;
+```
+
+The query above results in the following output:
+
+```text
++-------------------+-------------------------+--+
+| number_of_orders  |         product         |
++-------------------+-------------------------+--+
+| 491291            | Banana                  |
+| 394930            | Bag of Organic Bananas  |
+| 275577            | Organic Strawberries    |
+| 251705            | Organic Baby Spinach    |
+| 220877            | Organic Hass Avocado    |
+| 184224            | Organic Avocado         |
+| 160792            | Large Lemon             |
+| 149445            | Strawberries            |
+| 146660            | Limes                   |
+| 142813            | Organic Whole Milk      |
++-------------------+-------------------------+--+
 ```
