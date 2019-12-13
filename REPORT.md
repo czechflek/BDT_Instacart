@@ -54,10 +54,10 @@ USE instacart;
 |   aisle_id  |   INT    |
 |   aisle     |  STRING  |
 
-HQL script which creates an external table `aisles`:
+Create an external table `aisles__ext`:
 
 ```hql
-CREATE EXTERNAL TABLE IF NOT EXISTS aisles (
+CREATE EXTERNAL TABLE IF NOT EXISTS aisles__ext (
     aisle_id INT,
     aisle STRING)
 ROW FORMAT
@@ -68,6 +68,28 @@ LOCATION '/user/czechflek/instacart/aisles'
 tblproperties("skip.header.line.count"="1");
 ```
 
+Create an optimized parquet table with snappy compression:
+
+```hql
+CREATE TABLE IF NOT EXISTS aisles (
+    aisle_id INT,
+    aisle STRING)
+STORED AS PARQUET
+tblproperties("parquet.compression"="SNAPPY");
+```
+
+Now we can load the the data into the new table and drop the external one:
+
+```hql
+INSERT OVERWRITE TABLE aisles
+SELECT
+    aisle_id,
+    aisle
+FROM aisles__ext;
+
+DROP TABLE aisles__ext;
+```
+
 #### Departments
 
 |   Field          | Datatype |
@@ -75,10 +97,10 @@ tblproperties("skip.header.line.count"="1");
 |   department_id  |   INT    |
 |   department     |  STRING  |
 
-HQL script which creates an external table `departments`:
+Create an external table `departments__ext`:
 
 ```hql
-CREATE EXTERNAL TABLE IF NOT EXISTS departments (
+CREATE EXTERNAL TABLE IF NOT EXISTS departments__ext (
     department_id INT,
     department STRING)
 ROW FORMAT
@@ -87,6 +109,28 @@ ROW FORMAT
 STORED AS TEXTFILE
 LOCATION '/user/czechflek/instacart/departments'
 tblproperties("skip.header.line.count"="1");
+```
+
+Create an optimized parquet table with snappy compression:
+
+```hql
+CREATE TABLE IF NOT EXISTS departments (
+    department_id INT,
+    department STRING)
+STORED AS PARQUET
+tblproperties("parquet.compression"="SNAPPY");
+```
+
+Now we can load the the data into the new table and drop the external one:
+
+```hql
+INSERT OVERWRITE TABLE departments
+SELECT
+    department_id,
+    department
+FROM departments__ext;
+
+DROP TABLE departments__ext;
 ```
 
 #### Products
@@ -98,10 +142,10 @@ tblproperties("skip.header.line.count"="1");
 |   aisle_id       |   INT    |
 |   department_id  |   INT    |
 
-HQL script which creates an external table `products`:
+Create an external table `products__ext`:
 
 ```hql
-CREATE EXTERNAL TABLE IF NOT EXISTS products (
+CREATE EXTERNAL TABLE IF NOT EXISTS products__ext (
     product_id INT,
     product_name STRING,
     aisle_id INT,
@@ -112,6 +156,32 @@ ROW FORMAT
 STORED AS TEXTFILE
 LOCATION '/user/czechflek/instacart/products'
 tblproperties("skip.header.line.count"="1");
+```
+
+Create an optimized parquet table with snappy compression:
+
+```hql
+CREATE TABLE IF NOT EXISTS products (
+    product_id INT,
+    product_name STRING,
+    aisle_id INT,
+    department_id INT)
+STORED AS PARQUET
+tblproperties("parquet.compression"="SNAPPY");
+```
+
+Now we can load the the data into the new table and drop the external one:
+
+```hql
+INSERT OVERWRITE TABLE products
+SELECT
+    product_id,
+    product_name,
+    aisle_id,
+    department_id
+FROM products__ext;
+
+DROP TABLE products__ext;
 ```
 
 #### Orders
@@ -126,10 +196,10 @@ tblproperties("skip.header.line.count"="1");
 |   order_hour_of_day       |    INT   |
 |   days_since_prior_order  |  FLOAT   |
 
-HQL script which creates an external table `orders`:
+Create an external tablee `orders__ext`:
 
 ```hql
-CREATE EXTERNAL TABLE IF NOT EXISTS orders (
+CREATE EXTERNAL TABLE IF NOT EXISTS orders__ext (
     order_id INT,
     user_id INT,
     eval_set STRING,
@@ -143,4 +213,87 @@ ROW FORMAT
 STORED AS TEXTFILE
 LOCATION '/user/czechflek/instacart/orders'
 tblproperties("skip.header.line.count"="1");
+```
+
+Create an optimized parquet table with snappy compression:
+
+```hql
+CREATE TABLE IF NOT EXISTS orders (
+    order_id INT,
+    user_id INT,
+    eval_set STRING,
+    order_number INT,
+    order_dow INT,
+    order_hour_of_day INT,
+    days_since_prior_order FLOAT)
+STORED AS PARQUET
+tblproperties("parquet.compression"="SNAPPY");
+```
+
+Now we can load the the data into the new table and drop the external one:
+
+```hql
+INSERT OVERWRITE TABLE orders
+SELECT
+    order_id,
+    user_id,
+    eval_set,
+    order_number,
+    order_dow,
+    order_hour_of_day,
+    days_since_prior_order
+FROM orders__ext;
+
+DROP TABLE orders__ext;
+```
+
+#### Order - Products
+
+|   Field                   | Datatype |
+|   ------------:           | :------- |
+|   order_id                |    INT   |
+|   product_id              |    INT   |
+|   add_to_cart_order       |    INT   |
+|   reordered               |    INT   |
+
+Create an external table `order_products__ext`:
+
+```hql
+CREATE EXTERNAL TABLE IF NOT EXISTS order_products__ext (
+    order_id INT,
+    product_id INT,
+    add_to_cart_order INT,
+    reordered INT)
+ROW FORMAT
+    DELIMITED FIELDS TERMINATED BY ','
+    LINES TERMINATED BY '\n'
+STORED AS TEXTFILE
+LOCATION '/user/czechflek/instacart/order_products'
+tblproperties("skip.header.line.count"="1");
+```
+
+Create an optimized parquet table with snappy compression:
+
+```hql
+CREATE TABLE IF NOT EXISTS order_products (
+    order_id INT,
+    product_id INT,
+    add_to_cart_order INT,
+    reordered INT)
+STORED AS PARQUET
+tblproperties("parquet.compression"="SNAPPY");
+```
+
+Now we can load the the data into the new table and drop the external one:
+
+```hql
+INSERT OVERWRITE TABLE order_products
+SELECT
+    order_id,
+    product_id,
+    add_to_cart_order,
+    reordered
+FROM order_products__ext;
+
+DROP TABLE order_products__ext;
 ```
