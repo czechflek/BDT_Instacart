@@ -2,7 +2,7 @@
 
 ## Data Preparation
 
-After we connect to the cluster, we start by downloading and extracting the dataset:
+Let's connect to the cluster and  start by downloading and extracting the dataset:
 
 ```shell
 ssh czechflek@hador.ics.muni.cz
@@ -296,4 +296,37 @@ SELECT
 FROM order_products__ext;
 
 DROP TABLE order_products__ext;
+```
+
+## Data Analysis
+
+### Top 5 Categories
+
+Since there is no category field, we are going to use `aisles` as our categories.
+To determine the most popular ones, we need to join `order_products` with `products` and then again with `aisles`. After that, we group the new joined table by aisles and extract the top 5.
+
+```hql
+SELECT COUNT(*) as Number_of_Products, A.aisle as Category
+FROM order_products
+    LEFT JOIN products
+        ON order_products.product_id = products.product_id
+    LEFT JOIN aisles as A
+        ON products.aisle_id = A.aisle_id
+GROUP BY A.aisle
+ORDER BY Number_of_Products DESC
+LIMIT 5;
+```
+
+The query above results in the following output:
+
+```text
++---------------------+-----------------------------+--+
+| number_of_products  |           category          |
++---------------------+-----------------------------+--+
+| 3787048             | fresh fruits                |
+| 3510733             | fresh vegetables            |
+| 1778128             | packaged vegetables fruits  |
+| 1449684             | yogurt                      |
+| 1005632             | packaged cheese             |
++---------------------+-----------------------------+--+
 ```
