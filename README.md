@@ -1,9 +1,30 @@
 # BigData Analysis - Instacart
 
+## Table of Contents
+
+- [BigData Analysis - Instacart](#bigdata-analysis---instacart)
+  - [Table of Contents](#table-of-contents)
+  - [Dataset](#dataset)
+  - [Data Preparation](#data-preparation)
+  - [Organizing Data in Hive](#organizing-data-in-hive)
+    - [Database](#database)
+    - [Tables](#tables)
+      - [Aisles](#aisles)
+      - [Departments](#departments)
+      - [Products](#products)
+      - [Orders](#orders)
+      - [Order - Products](#order---products)
+  - [Data Analysis](#data-analysis)
+    - [Top 5 Categories](#top-5-categories)
+    - [Top 10 Products](#top-10-products)
+    - [Top 10 Product Pairs](#top-10-product-pairs)
+    - [ABC Analysis](#abc-analysis)
+    - [Typical Customer](#typical-customer)
+    - [Orders by Day of the Week](#orders-by-day-of-the-week)
+
 ## Dataset
 
 The dataset used in this project is available at [Instacart](https://www.instacart.com/datasets/grocery-shopping-2017)
-
 
 ## Data Preparation
 
@@ -32,6 +53,8 @@ Since we will need each CSV in its own separate folder, we need to create them o
  ```
 
 ## Organizing Data in Hive
+
+### Database
 
  Before we can start analysing data, we need to load the datasets to Hive. 
 
