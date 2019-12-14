@@ -56,7 +56,7 @@ Since we will need each CSV in its own separate folder, we need to create them o
 
 ### Database
 
- Before we can start analysing data, we need to load the datasets to Hive. 
+ Before we can start analysing data, we need to load the datasets to Hive.
 
 We use the following command to connect to Hive:
 
@@ -77,10 +77,10 @@ USE instacart;
 
 #### Aisles
 
-|   Field     | Datatype |
-|   -------:  | :------- |
-|   aisle_id  |   INT    |
-|   aisle     |  STRING  |
+|    Field | Datatype |
+| -------: | :------- |
+| aisle_id | INT      |
+|    aisle | STRING   |
 
 Create an external table `aisles__ext`:
 
@@ -120,10 +120,10 @@ DROP TABLE aisles__ext;
 
 #### Departments
 
-|   Field          | Datatype |
-|   ------------:  | :------- |
-|   department_id  |   INT    |
-|   department     |  STRING  |
+|         Field | Datatype |
+| ------------: | :------- |
+| department_id | INT      |
+|    department | STRING   |
 
 Create an external table `departments__ext`:
 
@@ -163,12 +163,12 @@ DROP TABLE departments__ext;
 
 #### Products
 
-|   Field          | Datatype |
-|   ------------:  | :------- |
-|   product_id     |   INT    |
-|   product_name   |  STRING  |
-|   aisle_id       |   INT    |
-|   department_id  |   INT    |
+|         Field | Datatype |
+| ------------: | :------- |
+|    product_id | INT      |
+|  product_name | STRING   |
+|      aisle_id | INT      |
+| department_id | INT      |
 
 Create an external table `products__ext`:
 
@@ -214,15 +214,15 @@ DROP TABLE products__ext;
 
 #### Orders
 
-|   Field                   | Datatype |
-|   ------------:           | :------- |
-|   order_id                |    INT   |
-|   user_id                 |    INT   |
-|   eval_set                |  STRING  |
-|   order_number            |    INT   |
-|   order_dow               |    INT   |
-|   order_hour_of_day       |    INT   |
-|   days_since_prior_order  |  FLOAT   |
+|                  Field | Datatype |
+| ---------------------: | :------- |
+|               order_id | INT      |
+|                user_id | INT      |
+|               eval_set | STRING   |
+|           order_number | INT      |
+|              order_dow | INT      |
+|      order_hour_of_day | INT      |
+| days_since_prior_order | FLOAT    |
 
 Create an external tablee `orders__ext`:
 
@@ -277,12 +277,12 @@ DROP TABLE orders__ext;
 
 #### Order - Products
 
-|   Field                   | Datatype |
-|   ------------:           | :------- |
-|   order_id                |    INT   |
-|   product_id              |    INT   |
-|   add_to_cart_order       |    INT   |
-|   reordered               |    INT   |
+|             Field | Datatype |
+| ----------------: | :------- |
+|          order_id | INT      |
+|        product_id | INT      |
+| add_to_cart_order | INT      |
+|         reordered | INT      |
 
 Create an external table `order_products__ext`:
 
@@ -442,7 +442,7 @@ CREATE VIEW IF NOT EXISTS products_ordered_vw AS
     SELECT opa.product_id, nums.Number_of_Orders, ROW_NUMBER() over (Order by nums.Number_of_Orders) as rowid
     FROM order_products AS opa
     LEFT JOIN (
-        SELECT COUNT(*) AS Number_of_Orders, opb.product_id 
+        SELECT COUNT(*) AS Number_of_Orders, opb.product_id
         FROM order_products AS opb
         GROUP BY opb.product_id
     ) as nums
@@ -453,9 +453,9 @@ CREATE VIEW IF NOT EXISTS products_ordered_vw AS
 Since the ABC analysis is not posible in HQL only, we create a python script. This allows us to calculate the nedded classes.
 Our selected thresholds:
 
-* A - 20 %
-* B - 30 %
-* C - 50 %
+- A - 20 %
+- B - 30 %
+- C - 50 %
 
 The script is saved as [ABC_analysis.py](ABC_analysis.py)
 
@@ -544,6 +544,7 @@ ORDER BY order_dow ASC;
 ```
 
 The result is:
+
 ```text
 +------------+---------------+--+
 | order_dow  | total_orders  |
