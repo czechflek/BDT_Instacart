@@ -428,6 +428,12 @@ CREATE VIEW IF NOT EXISTS products_ordered_vw AS
 ```
 
 Since the ABC analysis is not posible in HQL only, we create a python script. This allows us to calculate the nedded classes.
+Our selected thresholds:
+
+* A - 20 %
+* B - 30 %
+* C - 50 %
+
 The script is saved as [ABC_analysis.py](ABC_analysis.py)
 
 ```text
