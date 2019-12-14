@@ -436,6 +436,8 @@ Our selected thresholds:
 
 The script is saved as [ABC_analysis.py](ABC_analysis.py)
 
+Top 5 products in each class:
+
 ```text
 Class A:
 +-------------------------+--------------------+--+
@@ -463,3 +465,77 @@ Class C:
 | "Cheese                | 7246               |
 +------------------------+--------------------+--+
 ```
+
+### Typical Customer
+
+It is trivial to determine the typical size of an order.
+
+```hql
+SELECT PERCENTILE(op.order_size, 0.5) as median_order_size, AVG(op.order_size) as average_order_size
+FROM (
+    SELECT COUNT(*) as order_size
+    FROM order_products
+    GROUP BY order_id
+) as op;
+```
+
+The query above outputs median and average size of an order.
+
+```text
++--------------------+---------------------+--+
+| median_order_size  | average_order_size  |
++--------------------+---------------------+--+
+| 8.0                | 10.10707325550502   |
++--------------------+---------------------+--+
+```
+
+Thanks to the field `days_since_prior_order` in the table `order`, calculating the frequency of orders is straightforward as well.
+
+```hql
+SELECT PERCENTILE(cast(days_since_prior_order AS BIGINT), 0.5) as median_days_between_orders, AVG(days_since_prior_order) as average_days_between_orders
+FROM orders
+WHERE days_since_prior_order IS NOT NULL;
+```
+
+The query above outputs median and average amount of days between orders.
+
+```text
++-----------------------------+------------------------------+--+
+| median_days_between_orders  | average_days_between_orders  |
++-----------------------------+------------------------------+--+
+| 7.0                         | 11.114836226863012           |
++-----------------------------+------------------------------+--+
+```
+
+### Orders by Day of the Week
+
+The data dictionary unfortunately doesn't specify whether value 0 in `orders.order_dow` corresponds to Sunday or Monday. Since Instacart is based in the USA, we will assume 0 = Sunday.
+
+To create histogram, we first need to collect the number of orders in each day:
+
+```hql
+SELECT order_dow, COUNT(*) as total_orders
+FROM orders
+GROUP BY order_dow
+ORDER BY order_dow ASC;
+```
+
+The result is:
+```text
++------------+---------------+--+
+| order_dow  | total_orders  |
++------------+---------------+--+
+| 0          | 600905        |
+| 1          | 587478        |
+| 2          | 467260        |
+| 3          | 436972        |
+| 4          | 426339        |
+| 5          | 453368        |
+| 6          | 448761        |
++------------+---------------+--+
+```
+
+Let's plot the distribution of orders by day of the week:
+![Distribution of orders by day of the week](orders_dow.png)
+
+As we can see, Sunday and Monday have the largest proportion of the placed orders.
