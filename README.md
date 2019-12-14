@@ -368,3 +368,92 @@ The query above results in the following output:
 | 142813            | Organic Whole Milk      |
 +-------------------+-------------------------+--+
 ```
+
+### Top 10 Product Pairs
+
+To calculate top 10 product pairs, we can use `CROSS JOIN`. This allows us to generate all product pairs within one order. The join has to be used with a condition, which prevents it from generating duplicates, such as "Bananas - Strawberies" and "Strawberries - Bananas".
+
+```hql
+SELECT Q.Number_Of_Orders, P1.product_name, P2.product_name
+FROM (
+    SELECT COUNT(*) as Number_Of_Orders, A.product_id as ProductId1, B.product_id as ProductId2
+    FROM order_products as A
+        CROSS JOIN order_products as B
+    WHERE A.product_id < B.product_id
+        AND A.order_id == B.order_id
+    GROUP BY A.product_id, B.product_id
+    ORDER BY Number_Of_Orders DESC
+    LIMIT 10
+    ) as Q
+LEFT JOIN products as P1
+    on Q.ProductId1 == P1.product_id
+LEFT JOIN products as P2
+    on Q.ProductId2 == P2.product_id;
+```
+
+The query above results in the following output:
+
+```text
++---------------------+-------------------------+-----------------------+--+
+| q.number_of_orders  |     p1.product_name     |    p2.product_name    |
++---------------------+-------------------------+-----------------------+--+
+| 64761               | Bag of Organic Bananas  | Organic Hass Avocado  |
+| 64702               | Bag of Organic Bananas  | Organic Strawberries  |
+| 58330               | Organic Strawberries    | Banana                |
+| 55611               | Banana                  | Organic Avocado       |
+| 53395               | Organic Baby Spinach    | Banana                |
+| 52608               | Bag of Organic Bananas  | Organic Baby Spinach  |
+| 43180               | Strawberries            | Banana                |
+| 43038               | Banana                  | Large Lemon           |
+| 42333               | Organic Strawberries    | Organic Hass Avocado  |
+| 42283               | Bag of Organic Bananas  | Organic Raspberries   |
++---------------------+-------------------------+-----------------------+--+
+```
+
+### ABC Analysis
+
+To make our life easier, we create a view, which contains order-products sorted by their popularity:
+
+```hql
+CREATE VIEW IF NOT EXISTS products_ordered_vw AS
+    SELECT opa.product_id, nums.Number_of_Orders, ROW_NUMBER() over (Order by nums.Number_of_Orders) as rowid
+    FROM order_products AS opa
+    LEFT JOIN (
+        SELECT COUNT(*) AS Number_of_Orders, opb.product_id 
+        FROM order_products AS opb
+        GROUP BY opb.product_id
+    ) as nums
+        ON opa.product_id == nums.product_id
+    ORDER BY nums.Number_of_Orders DESC;
+```
+
+Since the ABC analysis is not posible in HQL only, we create a python script. This allows us to calculate the nedded classes.
+The script is saved as [ABC_analysis.py](ABC_analysis.py)
+
+```text
+Class A:
++-------------------------+--------------------+--+
+| Banana                  | 491291             |
+| Bag of Organic Bananas  | 394930             |
+| Organic Strawberries    | 275577             |
+| Organic Baby Spinach    | 251705             |
+| Organic Hass Avocado    | 220877             |
++-------------------------+--------------------+--+
+Class B:
++----------------------------------------------+--------------------+--+
+| Large Alfresco Eggs                          | 42274              |
+| Roma Tomato                                  | 42165              |
+| Organic Grade A Free Range Large Brown Eggs  | 41812              |
+| "Clementines                                 | 41303              |
+| Orange Bell Pepper                           | 41052              |
++----------------------------------------------+--------------------+--+
+
+Class C:
++------------------------+--------------------+--+
+| "Bread                 | 19526              |
+| "Tortillas             | 14692              |
+| "Tortilla Chips        | 12201              |
+| "Tomatoes              | 8172               |
+| "Cheese                | 7246               |
++------------------------+--------------------+--+
+```
